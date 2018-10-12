@@ -1,25 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CustomGoogleDrive.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication;
-using System.Security.Claims;
-using System.Reflection;
-//using IdentityServer4.EntityFramework.DbContexts;
-//using CustomGoogleDrive.Config;
-//using IdentityServer4;
-//using IdentityServer4.EntityFramework.Mappers;
 
 namespace CustomGoogleDrive
 {
@@ -36,7 +28,6 @@ namespace CustomGoogleDrive
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
-            var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -55,32 +46,6 @@ namespace CustomGoogleDrive
             services.AddIdentity<ApplicationUser, IdentityRole<int>>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
-
-            //services.AddIdentityServer(options =>
-            //{
-            //    options.Events.RaiseErrorEvents = true;
-            //    options.Events.RaiseInformationEvents = true;
-            //    options.Events.RaiseFailureEvents = true;
-            //    options.Events.RaiseSuccessEvents = true;
-            //})
-            //    .AddConfigurationStore(options =>
-            //    {
-            //        options.ConfigureDbContext = b =>
-            //            b.UseSqlServer(connectionString,
-            //                sql => sql.MigrationsAssembly(migrationsAssembly));
-            //    })
-            //    // this adds the operational data from DB (codes, tokens, consents)
-            //    .AddOperationalStore(options =>
-            //    {
-            //        options.ConfigureDbContext = b =>
-            //            b.UseSqlServer(connectionString,
-            //                sql => sql.MigrationsAssembly(migrationsAssembly));
-
-            //        // this enables automatic token cleanup. this is optional.
-            //        options.EnableTokenCleanup = true;
-            //        // options.TokenCleanupInterval = 15; // frequency in seconds to cleanup stale grants. 15 is useful during debugging
-            //    })
-            //    .AddAspNetIdentity<ApplicationUser>();
 
             services
                 .AddAuthentication()
@@ -133,42 +98,5 @@ namespace CustomGoogleDrive
 
             app.UseMvc();
         }
-
-        //private static void InitializeDatabase(IApplicationBuilder app)
-        //{
-        //    using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-        //    {
-        //        serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
-
-        //        var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
-        //        context.Database.Migrate();
-        //        if (!context.Clients.Any())
-        //        {
-        //            foreach (var client in AuthConfig.GetClients())
-        //            {
-        //                context.Clients.Add(client.ToEntity());
-        //            }
-        //            context.SaveChanges();
-        //        }
-
-        //        if (!context.IdentityResources.Any())
-        //        {
-        //            foreach (var resource in AuthConfig.GetIdentityResources())
-        //            {
-        //                context.IdentityResources.Add(resource.ToEntity());
-        //            }
-        //            context.SaveChanges();
-        //        }
-
-        //        if (!context.ApiResources.Any())
-        //        {
-        //            foreach (var resource in AuthConfig.GetApiResources())
-        //            {
-        //                context.ApiResources.Add(resource.ToEntity());
-        //            }
-        //            context.SaveChanges();
-        //        }
-        //    }
-        //}
     }
 }
