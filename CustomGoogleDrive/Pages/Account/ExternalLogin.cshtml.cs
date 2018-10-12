@@ -98,14 +98,51 @@ namespace Googledriveapi.Pages.Account
                 // If the user does not have an account, then ask the user to create an account.
                 ReturnUrl = returnUrl;
                 LoginProvider = info.LoginProvider;
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                var user = new ApplicationUser
                 {
-                    Input = new InputModel
+                    Email = email,
+                    EmailConfirmed = true,
+                    UserName = email
+                };
+
+                var userCreatedResult = await _userManager.CreateAsync(user);
+
+                if (userCreatedResult.Succeeded)
+                {
+                    var loginResult = await _userManager.AddLoginAsync(user,
+                        new UserLoginInfo(info.LoginProvider, info.ProviderKey, info.ProviderDisplayName));
+
+                    if (loginResult.Succeeded)
                     {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
-                    };
+                        var props = new AuthenticationProperties();
+                        props.StoreTokens(info.AuthenticationTokens);
+                        await _signInManager.SignInAsync(user, props, info.LoginProvider);
+
+                        await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
+                    }
+
+                    else
+                    {
+                        foreach (var loginResultError in loginResult.Errors)
+                        {
+                            _logger.LogError($"Code: {loginResultError.Code}");
+                            _logger.LogError($"Description: {loginResultError.Description}");
+                        }
+                    }
                 }
-                return Page();
+                else
+                {
+                    foreach (var userCreatedError in userCreatedResult.Errors)
+                    {
+                        _logger.LogError($"Code: {userCreatedError.Code}");
+                        _logger.LogError($"Description: {userCreatedError.Description}");
+                    }
+                }
+
+                return LocalRedirect(Url.GetLocalUrl(returnUrl));
+
             }
         }
 
