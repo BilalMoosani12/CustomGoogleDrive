@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -93,21 +94,26 @@ namespace CustomGoogleDrive
                     googleOptions.SaveTokens = true;
                     googleOptions.Events.OnCreatingTicket = ctx =>
                     {
-                        List<AuthenticationToken> tokens = ctx.Properties.GetTokens()
-                            as List<AuthenticationToken>;
-                        tokens.Add(new AuthenticationToken()
+                        if (ctx.Properties.GetTokens() is List<AuthenticationToken> tokens)
                         {
-                            Name = "TicketCreated",
-                            Value = DateTime.UtcNow.ToString()
-                        });
-                        ctx.Properties.StoreTokens(tokens);
+                            tokens.Add(new AuthenticationToken()
+                            {
+                                Name = "TicketCreated",
+                                Value = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)
+                            });
+                            ctx.Properties.StoreTokens(tokens);
+                        }
+
                         return Task.CompletedTask;
                     };
                 })
                 .AddFacebook(facebookOptions =>
                 {
-
-                });
+                    facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
+                    facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                    facebookOptions.SaveTokens = true;
+                    facebookOptions.Scope.Add("email");
+                }); 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
