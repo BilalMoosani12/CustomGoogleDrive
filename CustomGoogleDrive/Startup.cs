@@ -106,14 +106,7 @@ namespace CustomGoogleDrive
 
                         return Task.CompletedTask;
                     };
-                })
-                .AddFacebook(facebookOptions =>
-                {
-                    facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
-                    facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
-                    facebookOptions.SaveTokens = true;
-                    facebookOptions.Scope.Add("email");
-                }); 
+                });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
