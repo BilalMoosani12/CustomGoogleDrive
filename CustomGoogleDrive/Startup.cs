@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
+using CustomGoogleDrive.Config;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
@@ -55,7 +56,9 @@ namespace CustomGoogleDrive
                     googleOptions.AccessType = "offline";
                     googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
                     googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
-                    googleOptions.Scope.Add("https://www.googleapis.com/auth/plus.login");
+                    foreach (var scope in GoogleScope.Scopes)
+                        googleOptions.Scope.Add(scope);
+
                     googleOptions.SaveTokens = true;
                     googleOptions.Events.OnCreatingTicket = ctx =>
                     {
