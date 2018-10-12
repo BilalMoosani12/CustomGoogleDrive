@@ -10,5 +10,16 @@ namespace CustomGoogleDrive.Data
             : base(options)
         {
         }
+
+        public DbSet<ApplicationUser> ApplicationUser { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<ApplicationUser>()
+                .Property(i => i.Id)
+                .ValueGeneratedOnAdd();
+        }
     }
 }
