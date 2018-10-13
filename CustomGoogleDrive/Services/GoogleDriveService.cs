@@ -115,5 +115,15 @@ namespace CustomGoogleDrive.Services
                 throw;
             }
         }
+
+        public DriveService GetDriveService(string accessToken)
+        {
+            var googleCredential = GoogleCredential.FromAccessToken(accessToken);
+            return new DriveService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = googleCredential,
+                ApplicationName = "",
+            });
+        }
     }
 }
