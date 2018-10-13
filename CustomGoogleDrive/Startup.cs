@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CustomGoogleDrive.Data;
+using CustomGoogleDrive.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication;
@@ -77,6 +78,8 @@ namespace CustomGoogleDrive
                 });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddScoped<IGoogleDriveService, GoogleDriveService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
