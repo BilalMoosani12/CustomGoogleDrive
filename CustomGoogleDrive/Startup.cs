@@ -42,9 +42,9 @@ namespace CustomGoogleDrive
                 options
                     .UseSqlServer(connectionString)
                     .EnableSensitiveDataLogging()
-                    .ConfigureWarnings(i => i.Throw())
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
-
+                    .ConfigureWarnings(i => i.Throw()));
+            
+                   // .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
             services.AddIdentity<ApplicationUser, IdentityRole<int>>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();

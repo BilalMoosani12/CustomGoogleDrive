@@ -116,12 +116,22 @@ namespace CustomGoogleDrive.Services
             }
         }
 
-        public DriveService GetDriveService(string accessToken)
+        public DriveService GetDriveService(string accessToken, string refreshToken, DateTime issueUtc, long expiresInSeconds, string providerKey)
         {
             var googleCredential = GoogleCredential.FromAccessToken(accessToken);
+
+            var tokenResponce = new TokenResponse();
+            tokenResponce.AccessToken = accessToken;
+            tokenResponce.RefreshToken = refreshToken;
+            tokenResponce.IssuedUtc = issueUtc;
+            tokenResponce.ExpiresInSeconds = expiresInSeconds;
+
+            var authorizationCodeFlow = new AuthorizationCodeFlow(new AuthorizationCodeFlow.Initializer(GoogleAuthConsts.OidcAuthorizationUrl, GoogleAuthConsts.OidcTokenUrl));
+
+            var userCredential = new UserCredential(authorizationCodeFlow, providerKey, tokenResponce);
             return new DriveService(new BaseClientService.Initializer()
             {
-                HttpClientInitializer = googleCredential,
+                HttpClientInitializer = userCredential,
                 ApplicationName = "",
             });
         }

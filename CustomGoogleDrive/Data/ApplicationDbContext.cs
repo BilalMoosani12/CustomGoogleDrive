@@ -12,6 +12,8 @@ namespace CustomGoogleDrive.Data
         }
 
         public DbSet<ApplicationUser> ApplicationUser { get; set; }
+        public DbSet<IdentityUserToken<int>> AspNetUserTokens { get; set; }
+        public DbSet<IdentityUserLogin<int>> AspNetUserLogins { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
