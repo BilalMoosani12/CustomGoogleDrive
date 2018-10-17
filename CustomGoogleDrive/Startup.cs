@@ -61,20 +61,6 @@ namespace CustomGoogleDrive
                         googleOptions.Scope.Add(scope);
 
                     googleOptions.SaveTokens = true;
-                    googleOptions.Events.OnCreatingTicket = ctx =>
-                    {
-                        if (ctx.Properties.GetTokens() is List<AuthenticationToken> tokens)
-                        {
-                            tokens.Add(new AuthenticationToken()
-                            {
-                                Name = "TicketCreated",
-                                Value = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)
-                            });
-                            ctx.Properties.StoreTokens(tokens);
-                        }
-
-                        return Task.CompletedTask;
-                    };
                 });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
