@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using CustomGoogleDrive.Data;
+using CustomGoogleDrive.Extensions;
 using CustomGoogleDrive.Services;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace CustomGoogleDrive.Pages
 {
@@ -14,58 +14,39 @@ namespace CustomGoogleDrive.Pages
     {
         private readonly ApplicationDbContext _context;
         private readonly GoogleDriveService _googleDriveService;
-        private readonly UserManager<IdentityUser<int>> _userManager;
-        private Task<IdentityUser<int>> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
         public IndexModel(ApplicationDbContext context,
-            UserManager<IdentityUser<int>> userManager,
             GoogleDriveService googleDriveService
             )
         {
-            _userManager = userManager;
             _context = context;
             _googleDriveService = googleDriveService;
         }
 
         public async Task OnGetAsync()
         {
-            var users = await _userManager.GetUserAsync(HttpContext.User);
-            var ProviderKey = _context.AspNetUserLogins
-                .Where(i => i.UserId == users.Id)
-                .Select(i => i.ProviderKey).Single();
+            var userId = Convert.ToInt32(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            //var userToken = _context.AspNetUserTokens
-            //    .Where(i => i.UserId == users.Id)
-            //    .Select(i => new
-            //    {
-            //        i.Value,
-            //        i.Name
-            //    }).ToDictionary(i => new { i.Name, i.Value });
+            var userToken = await _context.AspNetUserTokens
+                .Where(i => i.UserId == userId)
+                .Select(i => new
+                {
+                    i.Value,
+                    i.Name
+                }).ToDictionaryAsync(i => i.Name, i => i.Value);
 
-            //var accessToken = userToken.TryGetValue( "a", out var accessType);
+            var accessToken = userToken["access_token"];
+            var expiresAt = DateTime.Parse(userToken["expires_at"]);
+            //var tokenType = userToken["token_type"];
 
-            var userToken = _context.AspNetUserTokens
-               .Where(i => i.UserId == users.Id)
-               .Select(i => new
-               {
-                   i.Value,
-                   i.Name
-               }).ToList();
+            var googleDrive =
+                _googleDriveService.GetDriveService(
+                    accessToken,
+                    "",
+                    expiresAt,
+                    (long)expiresAt.ConvertToUnixTimestamp(),
+                    userId.ToString());
 
-            var accessToken = userToken
-                .Where(i => i.Name == "access_token")
-                .Select(i => i.Value).Single();
-            var expires_at = userToken
-               .Where(i => i.Name == "expires_at")
-               .Select(i => i.Value).Single();
-            var token_type = userToken
-               .Where(i => i.Name == "token_type")
-               .Select(i => i.Value).Single();
-            var TicketCreated = userToken
-              .Where(i => i.Name == "TicketCreated")
-              .Select(i => i.Value).Single();
-
-            googleDriveService.
 
         }
     }
